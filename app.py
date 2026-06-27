@@ -437,14 +437,16 @@ def page_demographics(df, sports):
     col1, col2 = st.columns(2)
 
     with col1:
+        # Non-Sports first so it renders as bottom layer; Sports-Related on top in orange
         age_df = pd.concat([
-            sports[["Age"]].assign(Type="Sports-Related"),
-            df[df["Sports_Related"] == "N"][["Age"]].assign(Type="Non-Sports")
+            df[df["Sports_Related"] == "N"][["Age"]].assign(Type="Non-Sports"),
+            sports[["Age"]].assign(Type="Sports-Related")
         ])
         fig = px.histogram(
             age_df, x="Age", color="Type", nbins=20,
             barmode="overlay", opacity=0.78,
             color_discrete_map={"Sports-Related": ACCENT, "Non-Sports": SECONDARY},
+            category_orders={"Type": ["Non-Sports", "Sports-Related"]},
             title="Age Distribution: Sports vs. Non-Sports Injuries",
             labels={"Age": "Age (years)", "count": "Count", "Type": ""}
         )
