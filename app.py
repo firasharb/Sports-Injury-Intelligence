@@ -437,21 +437,20 @@ def page_demographics(df, sports):
     col1, col2 = st.columns(2)
 
     with col1:
-        fig = go.Figure()
-        fig.add_trace(go.Histogram(
-            x=sports["Age"], nbinsx=20, name="Sports-Related",
-            marker_color=ACCENT, opacity=0.80
-        ))
-        fig.add_trace(go.Histogram(
-            x=df[df["Sports_Related"] == "N"]["Age"], nbinsx=20,
-            name="Non-Sports", marker_color=SECONDARY, opacity=0.55
-        ))
-        fig.update_layout(
-            barmode="overlay",
+        age_df = pd.concat([
+            sports[["Age"]].assign(Type="Sports-Related"),
+            df[df["Sports_Related"] == "N"][["Age"]].assign(Type="Non-Sports")
+        ])
+        fig = px.histogram(
+            age_df, x="Age", color="Type", nbins=20,
+            barmode="overlay", opacity=0.78,
+            color_discrete_map={"Sports-Related": ACCENT, "Non-Sports": SECONDARY},
             title="Age Distribution: Sports vs. Non-Sports Injuries",
-            xaxis_title="Age (years)", yaxis_title="Count",
+            labels={"Age": "Age (years)", "count": "Count", "Type": ""}
+        )
+        fig.update_layout(
             height=400,
-            legend=dict(orientation="h", yanchor="bottom", y=1.02)
+            legend=dict(orientation="h", yanchor="bottom", y=1.02, title="")
         )
         st.plotly_chart(fig, use_container_width=True)
 
