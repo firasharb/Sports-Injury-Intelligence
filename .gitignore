@@ -1,0 +1,18 @@
+# Unused data files
+neiss2025.xlsx
+neiss_sample_classified.xlsx
+neiss_sample_classified_old.xlsx
+neiss_sample_classified_old_v2.xlsx
+neiss_time_series.xlsx
+neiss_time_series_classified_old.xlsx
+
+# Python
+__pycache__/
+*.pyc
+
+# Claude
+.claude/
+
+# Misc
+screenshots/
+*.pdf
