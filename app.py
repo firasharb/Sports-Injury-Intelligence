@@ -458,7 +458,7 @@ def page_demographics(df, sports):
 
     with col2:
         top10 = sports["Sport_Type"].value_counts().head(10).index
-        gd = sports[sports["Sport_Type"].isin(top10)]
+        gd = sports[sports["Sport_Type"].isin(top10) & sports["Sex_Label"].isin(["Male", "Female"])]
         gp = gd.groupby(["Sport_Type", "Sex_Label"]).size().reset_index(name="Count")
         fig2 = px.bar(
             gp, x="Sport_Type", y="Count", color="Sex_Label",
@@ -497,7 +497,7 @@ def page_demographics(df, sports):
         st.plotly_chart(fig4, use_container_width=True)
 
     with col4:
-        sx = sports["Sex_Label"].value_counts().reset_index()
+        sx = sports[sports["Sex_Label"].isin(["Male", "Female"])]["Sex_Label"].value_counts().reset_index()
         sx.columns = ["Gender", "Count"]
         fig5 = px.bar(
             sx, x="Gender", y="Count", color="Gender",
