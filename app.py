@@ -3,8 +3,10 @@ warnings.filterwarnings("ignore")
 
 import time
 import datetime
+import json
 
 import streamlit as st
+import streamlit.components.v1 as components
 import extra_streamlit_components as stx
 import pandas as pd
 import plotly.express as px
@@ -598,6 +600,200 @@ def page_demographics(df, sports):
         st.plotly_chart(fig5, use_container_width=True)
 
 
+# ── Body diagram HTML helper ───────────────────────────────────────────────────
+def _body_diagram_html(sports_df):
+    bp_raw = sports_df["Body_Part_Label"].value_counts()
+    data   = {k: int(v) for k, v in bp_raw.items()}
+    total  = int(bp_raw.sum())
+
+    tmpl = r"""<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:transparent;font-family:-apple-system,'Segoe UI',Calibri,sans-serif}
+.bp{fill:#dde8f0;stroke:rgba(255,255,255,.75);stroke-width:1.3;cursor:pointer;
+    transition:filter .15s,stroke .15s}
+.bp:hover{filter:brightness(1.22) drop-shadow(0 0 5px rgba(31,78,121,.5));
+          stroke:#1f4e79;stroke-width:2}
+#tip{position:fixed;background:rgba(18,52,95,.94);color:#fff;
+     padding:9px 13px;border-radius:8px;font-size:12px;line-height:1.7;
+     pointer-events:none;display:none;z-index:9999;
+     box-shadow:0 4px 14px rgba(0,0,0,.3);min-width:148px}
+.tn{font-weight:700;font-size:13px}
+.tr{font-size:10px;color:rgba(255,255,255,.55)}
+.tc{font-size:12px}
+.tp{font-size:11px;color:rgba(255,255,255,.7)}
+</style></head>
+<body>
+<div id="tip"><div class="tn" id="tn"></div><div class="tr" id="tr"></div>
+<div class="tc" id="tc"></div><div class="tp" id="tp"></div></div>
+
+<div style="display:flex;align-items:flex-start;gap:14px;padding:6px 10px">
+<svg viewBox="0 0 200 428" style="width:178px;flex-shrink:0;overflow:visible">
+
+  <!-- Torso (rendered first = behind) -->
+  <g data-part="Upper Trunk"><rect class="bp" x="68" y="93" width="64" height="62" rx="3"/></g>
+  <g data-part="Lower Trunk"><rect class="bp" x="70" y="155" width="60" height="48" rx="3"/></g>
+  <g data-part="Pubic Region"><rect class="bp" x="74" y="203" width="52" height="19" rx="4"/></g>
+
+  <!-- Arms -->
+  <g data-part="Upper Arm">
+    <rect class="bp" x="28" y="115" width="21" height="58" rx="5"/>
+    <rect class="bp" x="151" y="115" width="21" height="58" rx="5"/>
+  </g>
+  <g data-part="Elbow">
+    <rect class="bp" x="29" y="173" width="19" height="16" rx="5"/>
+    <rect class="bp" x="152" y="173" width="19" height="16" rx="5"/>
+  </g>
+  <g data-part="Lower Arm">
+    <rect class="bp" x="30" y="189" width="17" height="50" rx="5"/>
+    <rect class="bp" x="153" y="189" width="17" height="50" rx="5"/>
+  </g>
+  <g data-part="Wrist">
+    <rect class="bp" x="31" y="239" width="15" height="13" rx="4"/>
+    <rect class="bp" x="154" y="239" width="15" height="13" rx="4"/>
+  </g>
+  <g data-part="Hand">
+    <rect class="bp" x="30" y="252" width="17" height="22" rx="4"/>
+    <rect class="bp" x="153" y="252" width="17" height="22" rx="4"/>
+  </g>
+  <g data-part="Finger">
+    <rect class="bp" x="31" y="274" width="15" height="18" rx="3"/>
+    <rect class="bp" x="154" y="274" width="15" height="18" rx="3"/>
+  </g>
+
+  <!-- Legs -->
+  <g data-part="Upper Leg">
+    <rect class="bp" x="72" y="222" width="26" height="64" rx="5"/>
+    <rect class="bp" x="102" y="222" width="26" height="64" rx="5"/>
+  </g>
+  <g data-part="Knee">
+    <rect class="bp" x="73" y="286" width="24" height="20" rx="7"/>
+    <rect class="bp" x="103" y="286" width="24" height="20" rx="7"/>
+  </g>
+  <g data-part="Lower Leg">
+    <rect class="bp" x="74" y="306" width="22" height="62" rx="5"/>
+    <rect class="bp" x="104" y="306" width="22" height="62" rx="5"/>
+  </g>
+  <g data-part="Ankle">
+    <rect class="bp" x="75" y="368" width="20" height="14" rx="4"/>
+    <rect class="bp" x="105" y="368" width="20" height="14" rx="4"/>
+  </g>
+  <g data-part="Foot">
+    <rect class="bp" x="68" y="382" width="30" height="14" rx="4"/>
+    <rect class="bp" x="102" y="382" width="30" height="14" rx="4"/>
+  </g>
+  <g data-part="Toe">
+    <rect class="bp" x="68" y="396" width="30" height="10" rx="3"/>
+    <rect class="bp" x="102" y="396" width="30" height="10" rx="3"/>
+  </g>
+
+  <!-- Neck + Head last so they sit on top -->
+  <g data-part="Neck"><rect class="bp" x="89" y="75" width="22" height="18" rx="3"/></g>
+  <g data-part="Head"><circle class="bp" cx="100" cy="41" r="34"/></g>
+  <g data-part="Face"><ellipse class="bp" cx="100" cy="45" rx="22" ry="28"/></g>
+  <g data-part="Ear">
+    <ellipse class="bp" cx="64" cy="41" rx="5" ry="9"/>
+    <ellipse class="bp" cx="136" cy="41" rx="5" ry="9"/>
+  </g>
+  <!-- Shoulder rendered on top of trunk/arm junction -->
+  <g data-part="Shoulder">
+    <rect class="bp" x="49" y="93" width="32" height="22" rx="5"/>
+    <rect class="bp" x="119" y="93" width="32" height="22" rx="5"/>
+  </g>
+
+</svg>
+
+<!-- Side legend -->
+<div style="padding-top:6px;flex:1;min-width:110px">
+  <div style="font-size:11px;font-weight:700;color:#1f4e79;margin-bottom:8px;
+              letter-spacing:.04em;text-transform:uppercase">Top Injuries</div>
+  <div id="lgd"></div>
+  <div style="margin-top:14px">
+    <div style="font-size:10px;color:#888;margin-bottom:4px">Injury frequency</div>
+    <canvas id="cbar" width="110" height="10" style="border-radius:3px;display:block"></canvas>
+    <div style="display:flex;justify-content:space-between;width:110px;
+                font-size:9px;color:#999;margin-top:2px">
+      <span>Low</span><span>High</span>
+    </div>
+  </div>
+</div>
+</div>
+<div style="text-align:center;color:#aaa;font-size:10px;margin-top:6px;font-style:italic">
+  Hover over any body region to see details
+</div>
+
+<script>
+var data  = %%%DATA%%%;
+var total = %%%TOTAL%%%;
+
+var norm = {};
+for (var k in data) {
+  var base = k.replace(/\s*\(old\)\s*/g,'').trim();
+  norm[base] = (norm[base]||0) + data[k];
+}
+var maxVal = 1;
+for (var p in norm) { if (norm[p] > maxVal) maxVal = norm[p]; }
+var sorted = Object.keys(norm).sort(function(a,b){ return norm[b]-norm[a]; });
+
+function colorScale(val) {
+  if (!val) return '#dde8f0';
+  var t = Math.pow(val/maxVal, 0.55);
+  var l=[189,215,238], d=[31,78,121];
+  return 'rgb('+Math.round(l[0]+t*(d[0]-l[0]))+','+
+               Math.round(l[1]+t*(d[1]-l[1]))+','+
+               Math.round(l[2]+t*(d[2]-l[2]))+')';
+}
+
+document.querySelectorAll('[data-part]').forEach(function(g) {
+  var part  = g.getAttribute('data-part').replace(/\s*\(old\)\s*/g,'').trim();
+  var count = norm[part]||0;
+  g.querySelectorAll('.bp').forEach(function(s){ s.style.fill=colorScale(count); });
+});
+
+var tip=document.getElementById('tip');
+document.querySelectorAll('[data-part]').forEach(function(g) {
+  g.addEventListener('mousemove', function(e) {
+    var part  = g.getAttribute('data-part').replace(/\s*\(old\)\s*/g,'').trim();
+    var count = norm[part]||0;
+    var pct   = total>0 ? (count/total*100).toFixed(1):'0.0';
+    var rank  = sorted.indexOf(part)+1;
+    document.getElementById('tn').textContent = part;
+    document.getElementById('tr').textContent = count>0 ? '#'+rank+' most injured':'';
+    document.getElementById('tc').textContent = count>0 ? count.toLocaleString()+' injuries':'No data for this region';
+    document.getElementById('tp').textContent = count>0 ? pct+'% of all sports injuries':'';
+    tip.style.display='block';
+    tip.style.left=(e.clientX+14)+'px';
+    tip.style.top=(e.clientY-50)+'px';
+  });
+  g.addEventListener('mouseleave',function(){ tip.style.display='none'; });
+});
+
+var lgd=document.getElementById('lgd');
+sorted.slice(0,9).forEach(function(part) {
+  var count=norm[part];
+  var pct=(count/total*100).toFixed(1);
+  var div=document.createElement('div');
+  div.style.cssText='display:flex;align-items:center;gap:7px;margin-bottom:5px';
+  var sw=document.createElement('div');
+  sw.style.cssText='width:12px;height:12px;border-radius:3px;flex-shrink:0;background:'+colorScale(count);
+  var tx=document.createElement('div');
+  tx.style.cssText='font-size:10px;color:#444;line-height:1.3';
+  tx.innerHTML='<b style="color:#1f4e79">'+part+'</b><br>'+count.toLocaleString()+' ('+pct+'%)';
+  div.appendChild(sw); div.appendChild(tx); lgd.appendChild(div);
+});
+
+var cv=document.getElementById('cbar');
+var ctx=cv.getContext('2d');
+var g2=ctx.createLinearGradient(0,0,110,0);
+g2.addColorStop(0,'#dde8f0'); g2.addColorStop(1,'#1f4e79');
+ctx.fillStyle=g2; ctx.fillRect(0,0,110,10);
+</script>
+</body></html>"""
+
+    return tmpl.replace("%%%DATA%%%", json.dumps(data)).replace("%%%TOTAL%%%", str(total))
+
+
 # ── PAGE 4 · Injury Profile ────────────────────────────────────────────────────
 def page_injury_profile(df, sports):
     st.title("🩺 Injury Profile")
@@ -607,16 +803,8 @@ def page_injury_profile(df, sports):
     col1, col2 = st.columns(2)
 
     with col1:
-        bp = sports["Body_Part_Label"].value_counts().head(12).reset_index()
-        bp.columns = ["Body Part", "Count"]
-        fig = px.bar(
-            bp.sort_values("Count"), x="Count", y="Body Part", orientation="h",
-            color="Count", color_continuous_scale=["#bdd7ee", PRIMARY],
-            title="Most Commonly Injured Body Parts", text="Count"
-        )
-        fig.update_traces(textposition="outside")
-        fig.update_layout(coloraxis_showscale=False, height=480, yaxis_title="")
-        st.plotly_chart(fig, use_container_width=True)
+        st.markdown("**Most Commonly Injured Body Parts**")
+        components.html(_body_diagram_html(sports), height=500)
 
     with col2:
         dx = sports["Diagnosis_Label"].value_counts().head(12).reset_index()
