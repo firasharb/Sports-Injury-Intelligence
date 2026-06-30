@@ -561,15 +561,27 @@ def page_demographics(df, sports):
     col3, col4 = st.columns(2)
 
     with col3:
+        age_order = ["Child (0–12)", "Teen (13–17)", "Young Adult (18–25)",
+                     "Adult (26–35)", "Middle-Aged (36–50)", "Senior (51–65)", "Elderly (65+)"]
         ag = sports["Age_Group"].value_counts().reset_index()
         ag.columns = ["Age Group", "Count"]
-        fig4 = px.pie(
-            ag, names="Age Group", values="Count", hole=0.45,
+        ag["Age Group"] = pd.Categorical(ag["Age Group"].astype(str), categories=age_order, ordered=True)
+        ag = ag.sort_values("Age Group")
+        ag["Pct"] = (ag["Count"] / ag["Count"].sum() * 100).round(1)
+        ag["Label"] = ag["Pct"].apply(lambda x: f"{x:.1f}%")
+        fig4 = px.bar(
+            ag, x="Age Group", y="Count",
+            text="Label",
             title="Sports Injuries by Age Group",
-            color_discrete_sequence=px.colors.sequential.Blues_r
+            color="Count",
+            color_continuous_scale=["#bdd7ee", PRIMARY],
         )
-        fig4.update_traces(textposition="outside", textinfo="percent+label")
-        fig4.update_layout(showlegend=False, height=400)
+        fig4.update_traces(textposition="outside")
+        fig4.update_layout(
+            coloraxis_showscale=False, height=400,
+            xaxis_title="", yaxis_title="Injuries",
+            xaxis_tickangle=-20,
+        )
         st.plotly_chart(fig4, use_container_width=True)
 
     with col4:
