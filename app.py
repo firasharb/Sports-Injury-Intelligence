@@ -391,16 +391,92 @@ def page_sports_danger(df, sports):
         st.plotly_chart(fig, use_container_width=True)
 
     with col2:
+        Y_CAP      = 22   # % — above this → off-scale callout
+        med_inj    = stats["Injuries"].median()
+        med_hosp   = stats["Hosp_Pct"].median()
+
+        offscale   = stats[stats["Hosp_Pct"] > Y_CAP]
+        plot_df    = stats[stats["Hosp_Pct"] <= Y_CAP].copy()
+
+        def _quad(row):
+            if row["Injuries"] < med_inj and row["Hosp_Pct"] >= med_hosp:
+                return "Low volume, high hospitalization"
+            if row["Injuries"] >= med_inj and row["Hosp_Pct"] < med_hosp:
+                return "High volume, low hospitalization"
+            return "Other sports"
+
+        plot_df["Category"] = plot_df.apply(_quad, axis=1)
+
+        # Label only volume leaders + low-vol/high-hosp outliers
+        top_vol    = plot_df.nlargest(6, "Injuries")["Sport"].tolist()
+        red_sports = plot_df[plot_df["Category"] == "Low volume, high hospitalization"]["Sport"].tolist()
+        label_set  = set(top_vol + red_sports)
+        plot_df["Label"] = plot_df["Sport"].apply(lambda s: s if s in label_set else "")
+
+        cat_colors = {
+            "Low volume, high hospitalization": "#c00000",
+            "High volume, low hospitalization": SECONDARY,
+            "Other sports":                     "#aaaaaa",
+        }
+        # Ensure legend order
+        cat_order = ["Low volume, high hospitalization",
+                     "High volume, low hospitalization",
+                     "Other sports"]
+
         fig2 = px.scatter(
-            stats, x="Injuries", y="Hosp_Pct",
-            size="Injuries", color="Hosp_Pct",
-            hover_name="Sport", text="Sport",
-            color_continuous_scale=["#70ad47", "#ed7d31", "#c00000"],
+            plot_df, x="Injuries", y="Hosp_Pct",
+            color="Category",
+            color_discrete_map=cat_colors,
+            category_orders={"Category": cat_order},
+            hover_name="Sport",
+            text="Label",
+            log_x=True,
             title="Injury Volume vs. Hospitalization Rate",
-            labels={"Injuries": "# Injuries", "Hosp_Pct": "Hospitalization Rate (%)"}
+            labels={"Injuries": "Injury volume (log scale)",
+                    "Hosp_Pct": "Hospitalization rate (%)", "Category": ""}
         )
-        fig2.update_traces(textposition="top center", textfont_size=9)
-        fig2.update_layout(height=520, coloraxis_showscale=False, margin=dict(t=50, b=10))
+        fig2.update_traces(
+            marker=dict(size=10, opacity=0.85),
+            textposition="top center",
+            textfont=dict(size=9),
+        )
+
+        # Quadrant reference lines (median volume × median rate)
+        fig2.add_vline(x=med_inj,   line_dash="dash", line_color="#999", line_width=1, opacity=0.6)
+        fig2.add_hline(y=med_hosp,  line_dash="dash", line_color="#999", line_width=1, opacity=0.6)
+
+        # Quadrant corner labels
+        fig2.add_annotation(x=0,   y=1,   xref="paper", yref="paper",
+                            text="rare · often hospitalized",
+                            showarrow=False, font=dict(size=8, color="#888"),
+                            xanchor="left",  yanchor="top")
+        fig2.add_annotation(x=1,   y=0,   xref="paper", yref="paper",
+                            text="common · rarely hospitalized",
+                            showarrow=False, font=dict(size=8, color="#888"),
+                            xanchor="right", yanchor="bottom")
+
+        # Off-scale callout(s)
+        if not offscale.empty:
+            callout = "  |  ".join(
+                f"▲ {r['Sport']} — {r['Hosp_Pct']:.0f}% (off scale)"
+                for _, r in offscale.iterrows()
+            )
+            fig2.add_annotation(
+                x=0.5, y=Y_CAP - 0.5,
+                xref="paper", yref="y",
+                text=callout,
+                showarrow=False,
+                font=dict(size=9, color="#c00000"),
+                xanchor="center", yanchor="top",
+                bgcolor="rgba(255,255,255,0.75)",
+            )
+
+        fig2.update_yaxes(range=[0, Y_CAP + 1])
+        fig2.update_layout(
+            height=520,
+            margin=dict(t=50, b=10),
+            legend=dict(orientation="h", yanchor="bottom", y=1.02, title=""),
+        )
         st.plotly_chart(fig2, use_container_width=True)
 
     # Treemap
