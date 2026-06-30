@@ -611,10 +611,9 @@ def _body_diagram_html(sports_df):
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:transparent;font-family:-apple-system,'Segoe UI',Calibri,sans-serif}
-.bp{fill:#dde8f0;stroke:rgba(255,255,255,.75);stroke-width:1.3;cursor:pointer;
-    transition:filter .15s,stroke .15s}
-.bp:hover{filter:brightness(1.22) drop-shadow(0 0 5px rgba(31,78,121,.5));
-          stroke:#1f4e79;stroke-width:2}
+.bp{cursor:pointer;stroke:rgba(255,255,255,.55);stroke-width:.8;
+    transition:filter .15s}
+.bp:hover{filter:brightness(1.18) drop-shadow(0 0 4px rgba(31,78,121,.55))}
 #tip{position:fixed;background:rgba(18,52,95,.94);color:#fff;
      padding:9px 13px;border-radius:8px;font-size:12px;line-height:1.7;
      pointer-events:none;display:none;z-index:9999;
@@ -629,79 +628,29 @@ body{background:transparent;font-family:-apple-system,'Segoe UI',Calibri,sans-se
 <div class="tc" id="tc"></div><div class="tp" id="tp"></div></div>
 
 <div style="display:flex;align-items:flex-start;gap:14px;padding:6px 10px">
-<svg viewBox="0 0 200 428" style="width:178px;flex-shrink:0;overflow:visible">
+<svg viewBox="0 0 360 800" style="width:205px;flex-shrink:0;overflow:visible">
+  <defs>
+    <path id="ho" d="M180,12 C214,12 232,34 232,66 C232,98 214,116 202,138 L204,150
+      C220,150 248,158 262,188 C266,210 298,300 300,360 C320,418 332,460 334,478
+      C341,502 346,526 344,546 C343,556 332,556 324,549 L300,547
+      C299,520 296,492 298,478 C290,438 272,400 268,360 C262,298 238,226 232,208
+      C230,260 224,340 224,380 C228,422 243,442 246,462 C249,512 241,560 237,600
+      C231,662 213,710 209,722 L208,736 C236,740 240,768 236,778 L181,784 L190,732
+      C181,650 178,560 180,486 L180,12 Z"/>
+    <clipPath id="bc">
+      <use href="#ho"/>
+      <use href="#ho" transform="matrix(-1,0,0,1,360,0)"/>
+    </clipPath>
+  </defs>
 
-  <!-- Torso (rendered first = behind) -->
-  <g data-part="Upper Trunk"><rect class="bp" x="68" y="93" width="64" height="62" rx="3"/></g>
-  <g data-part="Lower Trunk"><rect class="bp" x="70" y="155" width="60" height="48" rx="3"/></g>
-  <g data-part="Pubic Region"><rect class="bp" x="74" y="203" width="52" height="19" rx="4"/></g>
-
-  <!-- Arms -->
-  <g data-part="Upper Arm">
-    <rect class="bp" x="28" y="115" width="21" height="58" rx="5"/>
-    <rect class="bp" x="151" y="115" width="21" height="58" rx="5"/>
-  </g>
-  <g data-part="Elbow">
-    <rect class="bp" x="29" y="173" width="19" height="16" rx="5"/>
-    <rect class="bp" x="152" y="173" width="19" height="16" rx="5"/>
-  </g>
-  <g data-part="Lower Arm">
-    <rect class="bp" x="30" y="189" width="17" height="50" rx="5"/>
-    <rect class="bp" x="153" y="189" width="17" height="50" rx="5"/>
-  </g>
-  <g data-part="Wrist">
-    <rect class="bp" x="31" y="239" width="15" height="13" rx="4"/>
-    <rect class="bp" x="154" y="239" width="15" height="13" rx="4"/>
-  </g>
-  <g data-part="Hand">
-    <rect class="bp" x="30" y="252" width="17" height="22" rx="4"/>
-    <rect class="bp" x="153" y="252" width="17" height="22" rx="4"/>
-  </g>
-  <g data-part="Finger">
-    <rect class="bp" x="31" y="274" width="15" height="18" rx="3"/>
-    <rect class="bp" x="154" y="274" width="15" height="18" rx="3"/>
+  <g clip-path="url(#bc)">
+    <rect x="0" y="0" width="360" height="800" fill="#e7eef5"/>
+    <g id="regions"></g>
   </g>
 
-  <!-- Legs -->
-  <g data-part="Upper Leg">
-    <rect class="bp" x="72" y="222" width="26" height="64" rx="5"/>
-    <rect class="bp" x="102" y="222" width="26" height="64" rx="5"/>
-  </g>
-  <g data-part="Knee">
-    <rect class="bp" x="73" y="286" width="24" height="20" rx="7"/>
-    <rect class="bp" x="103" y="286" width="24" height="20" rx="7"/>
-  </g>
-  <g data-part="Lower Leg">
-    <rect class="bp" x="74" y="306" width="22" height="62" rx="5"/>
-    <rect class="bp" x="104" y="306" width="22" height="62" rx="5"/>
-  </g>
-  <g data-part="Ankle">
-    <rect class="bp" x="75" y="368" width="20" height="14" rx="4"/>
-    <rect class="bp" x="105" y="368" width="20" height="14" rx="4"/>
-  </g>
-  <g data-part="Foot">
-    <rect class="bp" x="68" y="382" width="30" height="14" rx="4"/>
-    <rect class="bp" x="102" y="382" width="30" height="14" rx="4"/>
-  </g>
-  <g data-part="Toe">
-    <rect class="bp" x="68" y="396" width="30" height="10" rx="3"/>
-    <rect class="bp" x="102" y="396" width="30" height="10" rx="3"/>
-  </g>
-
-  <!-- Neck + Head last so they sit on top -->
-  <g data-part="Neck"><rect class="bp" x="89" y="75" width="22" height="18" rx="3"/></g>
-  <g data-part="Head"><circle class="bp" cx="100" cy="41" r="34"/></g>
-  <g data-part="Face"><ellipse class="bp" cx="100" cy="45" rx="22" ry="28"/></g>
-  <g data-part="Ear">
-    <ellipse class="bp" cx="64" cy="41" rx="5" ry="9"/>
-    <ellipse class="bp" cx="136" cy="41" rx="5" ry="9"/>
-  </g>
-  <!-- Shoulder rendered on top of trunk/arm junction -->
-  <g data-part="Shoulder">
-    <rect class="bp" x="49" y="93" width="32" height="22" rx="5"/>
-    <rect class="bp" x="119" y="93" width="32" height="22" rx="5"/>
-  </g>
-
+  <use href="#ho" fill="none" stroke="#15263b" stroke-width="2.3" stroke-linejoin="round"/>
+  <use href="#ho" fill="none" stroke="#15263b" stroke-width="2.3" stroke-linejoin="round"
+       transform="matrix(-1,0,0,1,360,0)"/>
 </svg>
 
 <!-- Side legend -->
@@ -726,68 +675,133 @@ body{background:transparent;font-family:-apple-system,'Segoe UI',Calibri,sans-se
 <script>
 var data  = %%%DATA%%%;
 var total = %%%TOTAL%%%;
+var SVGNS = "http://www.w3.org/2000/svg";
 
+// ── Region geometry (central spans both halves; limbs drawn once + mirrored) ──
+var central = [
+  {p:"Neck",         poly:[[158,118],[202,118],[203,150],[157,150]]},
+  {p:"Shoulder",     poly:[[108,150],[252,150],[264,196],[98,196]]},
+  {p:"Upper Trunk",  poly:[[126,196],[234,196],[233,330],[127,330]]},
+  {p:"Lower Trunk",  poly:[[129,330],[231,330],[227,430],[133,430]]},
+  {p:"Pubic Region", poly:[[137,430],[223,430],[216,486],[144,486]]}
+];
+var rlimb = [
+  {p:"Upper Arm",  poly:[[262,196],[300,360],[268,360],[234,196]]},
+  {p:"Elbow",      poly:[[300,360],[309,392],[277,392],[268,360]]},
+  {p:"Lower Arm",  poly:[[309,392],[331,470],[299,470],[277,392]]},
+  {p:"Wrist",      poly:[[331,470],[335,484],[301,484],[299,470]]},
+  {p:"Hand",       poly:[[335,484],[343,528],[301,528],[301,484]]},
+  {p:"Finger",     poly:[[343,528],[345,547],[301,547],[301,528]]},
+  {p:"Upper Leg",  poly:[[244,470],[237,585],[176,585],[180,470]]},
+  {p:"Knee",       poly:[[237,585],[233,615],[178,615],[176,585]]},
+  {p:"Lower Leg",  poly:[[233,615],[210,720],[189,720],[178,615]]},
+  {p:"Ankle",      poly:[[210,720],[208,736],[190,736],[189,720]]},
+  {p:"Foot",       poly:[[208,736],[236,773],[182,773],[190,736]]},
+  {p:"Toe",        poly:[[236,773],[236,785],[182,785],[182,773]]}
+];
+var ellipses = [
+  {p:"Head", cx:180, cy:64, rx:50, ry:54},
+  {p:"Face", cx:180, cy:74, rx:29, ry:36},
+  {p:"Ear",  cx:130, cy:64, rx:8,  ry:13},
+  {p:"Ear",  cx:230, cy:64, rx:8,  ry:13}
+];
+
+var regionParts = {};
+central.forEach(function(r){regionParts[r.p]=1;});
+rlimb.forEach(function(r){regionParts[r.p]=1;});
+ellipses.forEach(function(r){regionParts[r.p]=1;});
+
+// ── Aggregate counts (collapse "(old)" duplicate codes) ───────────────────────
 var norm = {};
 for (var k in data) {
-  var base = k.replace(/\s*\(old\)\s*/g,'').trim();
+  var base = k.replace(/\s*\(old\)\s*/g,"").trim();
   norm[base] = (norm[base]||0) + data[k];
 }
 var maxVal = 1;
-for (var p in norm) { if (norm[p] > maxVal) maxVal = norm[p]; }
-var sorted = Object.keys(norm).sort(function(a,b){ return norm[b]-norm[a]; });
+for (var p in norm) { if (regionParts[p] && norm[p] > maxVal) maxVal = norm[p]; }
+var sorted = Object.keys(norm)
+  .filter(function(p){ return regionParts[p]; })
+  .sort(function(a,b){ return norm[b]-norm[a]; });
 
 function colorScale(val) {
-  if (!val) return '#dde8f0';
+  if (!val) return "#dfe7ef";
   var t = Math.pow(val/maxVal, 0.55);
   var l=[189,215,238], d=[31,78,121];
-  return 'rgb('+Math.round(l[0]+t*(d[0]-l[0]))+','+
-               Math.round(l[1]+t*(d[1]-l[1]))+','+
-               Math.round(l[2]+t*(d[2]-l[2]))+')';
+  return "rgb("+Math.round(l[0]+t*(d[0]-l[0]))+","+
+               Math.round(l[1]+t*(d[1]-l[1]))+","+
+               Math.round(l[2]+t*(d[2]-l[2]))+")";
 }
 
-document.querySelectorAll('[data-part]').forEach(function(g) {
-  var part  = g.getAttribute('data-part').replace(/\s*\(old\)\s*/g,'').trim();
-  var count = norm[part]||0;
-  g.querySelectorAll('.bp').forEach(function(s){ s.style.fill=colorScale(count); });
-});
-
-var tip=document.getElementById('tip');
-document.querySelectorAll('[data-part]').forEach(function(g) {
-  g.addEventListener('mousemove', function(e) {
-    var part  = g.getAttribute('data-part').replace(/\s*\(old\)\s*/g,'').trim();
+var tip = document.getElementById("tip");
+function attachHover(el, part) {
+  el.addEventListener("mousemove", function(e) {
     var count = norm[part]||0;
-    var pct   = total>0 ? (count/total*100).toFixed(1):'0.0';
+    var pct   = total>0 ? (count/total*100).toFixed(1) : "0.0";
     var rank  = sorted.indexOf(part)+1;
-    document.getElementById('tn').textContent = part;
-    document.getElementById('tr').textContent = count>0 ? '#'+rank+' most injured':'';
-    document.getElementById('tc').textContent = count>0 ? count.toLocaleString()+' injuries':'No data for this region';
-    document.getElementById('tp').textContent = count>0 ? pct+'% of all sports injuries':'';
-    tip.style.display='block';
-    tip.style.left=(e.clientX+14)+'px';
-    tip.style.top=(e.clientY-50)+'px';
+    document.getElementById("tn").textContent = part;
+    document.getElementById("tr").textContent = count>0 ? "#"+rank+" most injured" : "";
+    document.getElementById("tc").textContent = count>0 ? count.toLocaleString()+" injuries" : "No data for this region";
+    document.getElementById("tp").textContent = count>0 ? pct+"% of all sports injuries" : "";
+    tip.style.display = "block";
+    tip.style.left = (e.clientX+14)+"px";
+    tip.style.top  = (e.clientY-50)+"px";
   });
-  g.addEventListener('mouseleave',function(){ tip.style.display='none'; });
-});
+  el.addEventListener("mouseleave", function(){ tip.style.display="none"; });
+}
 
-var lgd=document.getElementById('lgd');
+function ptsStr(poly) {
+  return poly.map(function(pt){ return pt[0]+","+pt[1]; }).join(" ");
+}
+
+var gRoot = document.getElementById("regions");
+
+function addPoly(poly, part) {
+  var el = document.createElementNS(SVGNS, "polygon");
+  el.setAttribute("points", ptsStr(poly));
+  el.setAttribute("class", "bp");
+  el.style.fill = colorScale(norm[part]||0);
+  attachHover(el, part);
+  gRoot.appendChild(el);
+}
+function addEllipse(o) {
+  var el = document.createElementNS(SVGNS, "ellipse");
+  el.setAttribute("cx", o.cx); el.setAttribute("cy", o.cy);
+  el.setAttribute("rx", o.rx); el.setAttribute("ry", o.ry);
+  el.setAttribute("class", "bp");
+  el.style.fill = colorScale(norm[o.p]||0);
+  attachHover(el, o.p);
+  gRoot.appendChild(el);
+}
+
+// Render order: head (so face can sit on top), trunk/shoulder, then limbs, then face
+ellipses.filter(function(o){return o.p==="Head"||o.p==="Ear";}).forEach(addEllipse);
+central.forEach(function(r){ addPoly(r.poly, r.p); });
+rlimb.forEach(function(r){
+  addPoly(r.poly, r.p);                                   // right side
+  addPoly(r.poly.map(function(pt){return [360-pt[0], pt[1]];}), r.p); // mirrored left
+});
+ellipses.filter(function(o){return o.p==="Face";}).forEach(addEllipse);
+
+// ── Legend ────────────────────────────────────────────────────────────────────
+var lgd = document.getElementById("lgd");
 sorted.slice(0,9).forEach(function(part) {
-  var count=norm[part];
-  var pct=(count/total*100).toFixed(1);
-  var div=document.createElement('div');
-  div.style.cssText='display:flex;align-items:center;gap:7px;margin-bottom:5px';
-  var sw=document.createElement('div');
-  sw.style.cssText='width:12px;height:12px;border-radius:3px;flex-shrink:0;background:'+colorScale(count);
-  var tx=document.createElement('div');
-  tx.style.cssText='font-size:10px;color:#444;line-height:1.3';
-  tx.innerHTML='<b style="color:#1f4e79">'+part+'</b><br>'+count.toLocaleString()+' ('+pct+'%)';
+  var count = norm[part];
+  var pct   = (count/total*100).toFixed(1);
+  var div = document.createElement("div");
+  div.style.cssText = "display:flex;align-items:center;gap:7px;margin-bottom:5px";
+  var sw = document.createElement("div");
+  sw.style.cssText = "width:12px;height:12px;border-radius:3px;flex-shrink:0;background:"+colorScale(count);
+  var tx = document.createElement("div");
+  tx.style.cssText = "font-size:10px;color:#444;line-height:1.3";
+  tx.innerHTML = "<b style='color:#1f4e79'>"+part+"</b><br>"+count.toLocaleString()+" ("+pct+"%)";
   div.appendChild(sw); div.appendChild(tx); lgd.appendChild(div);
 });
 
-var cv=document.getElementById('cbar');
-var ctx=cv.getContext('2d');
-var g2=ctx.createLinearGradient(0,0,110,0);
-g2.addColorStop(0,'#dde8f0'); g2.addColorStop(1,'#1f4e79');
-ctx.fillStyle=g2; ctx.fillRect(0,0,110,10);
+var cv  = document.getElementById("cbar");
+var ctx = cv.getContext("2d");
+var g2  = ctx.createLinearGradient(0,0,110,0);
+g2.addColorStop(0,"#dfe7ef"); g2.addColorStop(1,"#1f4e79");
+ctx.fillStyle = g2; ctx.fillRect(0,0,110,10);
 </script>
 </body></html>"""
 
@@ -804,7 +818,7 @@ def page_injury_profile(df, sports):
 
     with col1:
         st.markdown("**Most Commonly Injured Body Parts**")
-        components.html(_body_diagram_html(sports), height=500)
+        components.html(_body_diagram_html(sports), height=520)
 
     with col2:
         dx = sports["Diagnosis_Label"].value_counts().head(12).reset_index()
